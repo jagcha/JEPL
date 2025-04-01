@@ -119,6 +119,7 @@ if JEPL020102 == 0:
 
 else:
     print(f'JEPL020102 skipped when testing is {init.t}. \n')
+    print('Hello world!')
     pass
 
 ############################################### Ends Profiling ##########################################################
