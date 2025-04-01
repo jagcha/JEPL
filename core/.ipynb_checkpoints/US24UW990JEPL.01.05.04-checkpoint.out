@@ -1,0 +1,38 @@
+Initialization: 
+
+Code US24UW990JEPL.01.05.04.py starts. 
+Codes executed when testing is 0. 
+Running program in /blue/mateescu/agustinchasco/Projects/reprojersey/core. 
+Reading data in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Saving data in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Time profiling starts. Program executed on 03-06-2025 at 10:40 PM EST.
+
+efine variables: files to read 
+
+Initializing paths. 
+
+Reading data in US24UW990JEPL.01.05.03_impl_pdf4nu.txt ... 
+
+Reading data in US24UW990JEPL.01.05.03_impl_pdf5nu.txt ... 
+
+Initialize data container. 
+
+f4nu: <class 'pandas.core.frame.DataFrame'> with shape (2699194, 314) 
+
+f5nu: <class 'pandas.core.frame.DataFrame'> with shape (4479213, 336) 
+
+Saving plot showing potential conflict resolution in /blue/mateescu/agustinchasco/Projects/reprojersey/core/US24UW990JEPL.01.05.04/implement/US24UW990JEPL.01.05.04_impl_potconff4.png ... 
+
+Saving plot showing potential conflict resolution in /blue/mateescu/agustinchasco/Projects/reprojersey/core/US24UW990JEPL.01.05.04/implement/US24UW990JEPL.01.05.04_impl_potconff5.png ... 
+
+map4l[:15]: 
+[(35, 'X40', 93.60586901126781), (36, 'X41', 93.58045401701396), (37, 'X42', 93.2375738831666), (31, 'X36', 90.49260631136553), (58, 'X63', 69.37567288605413), (69, 'X74', 68.8059102087512), (29, 'X33', 54.26156845339757), (13, 'X17', 46.72843078341164), (55, 'X60', 38.41079966834544), (56, 'X61', 37.045540261278), (57, 'X62', 36.49993294294519), (33, 'X38', 35.89138090852306), (61, 'X66', 35.83417864740363), (44, 'X49', 35.096217611627765), (62, 'X67', 35.051018933800236)] 
+
+map5l[:15]: 
+[(13, 'X17', 93.33704380657942), (26, 'X30', 3.60253017661808), (168, 'X173', 3.5945600265046562), (172, 'X177', 2.8281084199389492), (176, 'X181', 2.8281084199389492), (37, 'X42', 2.623094726685246), (41, 'X46', 2.623094726685246), (52, 'X57', 2.623094726685246), (56, 'X61', 2.623094726685246), (82, 'X87', 2.623094726685246), (86, 'X91', 2.623094726685246), (97, 'X102', 2.623094726685246), (101, 'X106', 2.623094726685246), (100, 'X105', 2.61744641301943), (40, 'X45', 2.6131376203810803)] 
+
+
+ Execution US24UW990JEPL.01.05.04 finished when testing is 0 
+Data was read and saved in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Elapsed time (hh:mm:ss) is 01:22:07
+

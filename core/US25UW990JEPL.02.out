@@ -1,0 +1,59 @@
+Initialization: 
+
+Code US25UW990JEPL.02.py starts. 
+Codes executed when testing is 1. 
+Running program in /blue/mateescu/agustinchasco/Projects/reprojersey/core. 
+Reading data in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Saving data in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Time profiling starts. Program executed on 04-01-2025 at 10:18 AM EST.
+
+Path `/blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test` already exists. 
+
+Path `/blue/mateescu/agustinchasco/Projects/reprojersey/core/US25UW990JEPL.02/test` already exists. 
+
+Loading map US25UW990JEPL.02_test_f4map.json in pathf4_map_path: 
+ /blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test/US25UW990JEPL.02_test_f4map.json 
+ 
+
+Loading map US25UW990JEPL.02_test_f5map.json in pathf5_map_path: 
+ /blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test/US25UW990JEPL.02_test_f5map.json 
+ 
+
+Creation of master map US25UW990JEPL.02_test_fmap.json in path: 
+ /blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test/US25UW990JEPL.02_test_fmap.json 
+ 
+
+HTML map file named US25UW990JEPL.02_test_fmap.html saved in pat: 
+ /blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test/US25UW990JEPL.02_test_fmap.html 
+ 
+
+JEPL010101 skipped when testing is 1. 
+
+JEPL010501 skipped when testing is 1. 
+
+JEPL010502 skipped when testing is 1. 
+
+JEPL010503 skipped when testing is 1. 
+
+JEPL010504 skipped when testing is 1. 
+
+JEPL020101 skipped when testing is 1. 
+
+JEPL020102 activated when testing is 1. 
+
+JEPL020101 activated when testing is 1. 
+
+Loading file US25UW990JEPL.01_test_010601pdfu.txt in path: 
+ /blue/mateescu/agustinchasco/Projects/reprojersey/data/US25UW990JEPL.02/test/US25UW990JEPL.01_test_010601pdfu.txt 
+ 
+
+init: <class 'US25UW990JEPL_02.Initializer'> (Not a DataFrame) 
+
+pdfu: <class 'pandas.core.frame.DataFrame'> with shape (23353, 650) 
+
+Setting key in merged dataset with 650 columns.
+
+ Execution US25UW990JEPL.02 finished when testing is 1 
+Data was read and saved in /blue/mateescu/agustinchasco/Projects/reprojersey/data. 
+Elapsed time (hh:mm:ss) is 00:00:12
+

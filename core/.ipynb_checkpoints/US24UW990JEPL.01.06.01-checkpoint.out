@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/blue/mateescu/agustinchasco/Projects/reprojersey/core/US24UW990JEPL.01.06.01.py", line 3, in <module>
+    import pandas as pd
+  File "/home/agustinchasco/.local/lib/python3.11/site-packages/pandas/__init__.py", line 19, in <module>
+    raise ImportError(
+ImportError: Unable to import required dependencies:
+pytz: No module named 'pytz'
+dateutil: No module named 'dateutil'
