@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import copy
 import json
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pandas as pd
 import requests
@@ -977,7 +978,6 @@ class DataContainer:
         fcp.to_html(sp, index=False)
     
     def ColSelect(self, f4='f4', f5='f5', key=None):
-        print(f'ColSelect --> key = {key}')
         k = [] if key is None else [key]
         if f4 == 'f4':
             c4 = ['f4X' + str(i4) for i4 in range(1, 315)]
@@ -1002,7 +1002,48 @@ class DataContainer:
             c5 = ['f5X' + str(i5) for i5 in f5]
 
         return c4 + c5 + k
+    
+    def GetKeyMask(self, dataset_name, subset_keys, lact):
+        c = 17
+        if lact == 'm':
+            sks = [k[:c] for k in subset_keys]
+            return self.__dict__[dataset_name]['Key'].str[:c].isin(sks)
+        elif lact == 'u':
+            return self.__dict__[dataset_name]['Key'].isin(subset_keys)
+        else:
+            raise AssertionError(f'Argument `lact` is {lact}. \n'
+                                 f'Only `m` (multiple) or `u` (unique) lactations is allowed. \n')
 
-    def View(self, dataset_name, n, f4='f4', f5='f5', lacts='m', seed=22):
-        pass
+    def GetSubset(self, dataset_name, colf4='f4', colf5='f5', keys=None, ext='', n=10, lact='m', seed=22):
+        c = 17
+        t = 25
+        if 'Key' not in self.__dict__[dataset_name].columns:
+            self.SetKey([dataset_name], [['f4X3', 'f4X4', 'f4X5', 'f4X35'], ['f5X3', 'f5X4', 'f5X5', 'f5X35']])
+        cols = self.ColSelect(f4=colf4, f5=colf5, key='Key')
+        print(f'cols are: \n {cols} \n \n')
+
+        if keys is None:
+            ks = list(set(self.__dict__[dataset_name]['Key']))
+            np.random.seed(seed)
+            sks = np.random.choice(ks, size=n, replace=False)
+            mask = self.GetKeyMask(dataset_name=dataset_name, subset_keys=sks, lact=lact)
+        else:
+            nk = len(keys[0])
+            assert all(len(k) == nk for k in keys), "Not all elements in parameter `keys` have the same length"
+            if nk == c:
+                mask = self.__dict__[dataset_name]['Key'].str[:c].isin(keys)
+            elif nk == t:
+                mask = self.__dict__[dataset_name]['Key'].isin(keys)
+            else:
+                raise AssertionError(f'Length of Key must be 17 or 25. Instead, it is {nk}. \n')
+        print(f'mask.head(): \n {mask.head()} \n \n')
+        sdf = self.__dict__[dataset_name].loc[mask, cols]
+        setattr(self, 'sdf', sdf)
+        self.ShowDatasets()
+        if ext != '':
+            ext = '_' + ext
+        fn = self.init.cn + ext + 'html'
+        fp = os.path.join(self.init.pp, self.init.cn, fn)
+        sdf.to_html(fp, index=False)
+        
 

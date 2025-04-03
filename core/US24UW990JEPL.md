@@ -991,9 +991,87 @@ A)
 B)
 - Activate, test and make sure of functionality of `010501`, `010502`, `010503`, `010504`, `010601`.
 
-I start with `must do`. The proceed with `should do`.
+I start with `must do`. Then proceed with `should do`.
 
 Plot events with a recorded `P` (pregnancy record) in the middle of reproductive events. Plot and save frequency table of these events.
 
 
+# Thursday 04/03/2025 
 
+## Basic Git Workflow
+
+### 1 Start Working (Switch to Your Branch)
+```bash
+# If you're already on your branch, skip this step.
+git checkout my_branch
+
+# If the branch doesn’t exist, create it and switch to it:
+git checkout -b my_branch
+```
+
+### 2 Make Changes & Save Them
+```bash
+# Modify your files as needed.
+# Check what has changed:
+git status
+
+# Add specific files:
+git add filename.py
+
+# OR add all modified files:
+git add .
+
+# Commit your changes with a message:
+git commit -m "Describe what you did"
+```
+
+### 3 Push Changes to GitHub
+```bash
+# Send your changes to the remote repository:
+git push origin my_branch
+```
+
+### 4 Merge Changes into `master` (When Ready)
+```bash
+# Switch to master
+git checkout master
+
+# Update master (make sure you have the latest version)
+git pull origin master
+
+# Merge your branch into master
+git merge my_branch
+
+# Push the updated master to GitHub
+git push origin master
+```
+
+### 5 Switch Back to Your Branch (Continue Working)
+```bash
+# If you need to continue working on your branch:
+git checkout my_branch
+```
+
+### Bonus Tips
+```bash
+# Check branches
+git branch  # Shows all local branches
+
+# See commit history
+git log --oneline --graph --all
+
+# Undo last commit (before pushing)
+git reset --soft HEAD~1
+
+# Undo last commit (after pushing, use with caution!)
+git revert HEAD
+git push origin my_branch
+```
+
+This is a **basic yet powerful workflow** that works for most Git projects.
+
+## Objective:
+- Create a function that targets a subset of Keys, otherwise takes a random sample.
+- Such function also must take a subset of columns.
+- Function must save subseted dataset as html.
+- The objective of this function is to visualize the data and reduce complexity.
