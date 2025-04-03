@@ -1038,12 +1038,12 @@ class DataContainer:
                 raise AssertionError(f'Length of Key must be 17 or 25. Instead, it is {nk}. \n')
         print(f'mask.head(): \n {mask.head()} \n \n')
         sdf = self.__dict__[dataset_name].loc[mask, cols]
+        sdf = sdf.reset_index(drop=True)
         setattr(self, 'sdf', sdf)
         self.ShowDatasets()
         if ext != '':
             ext = '_' + ext
-        fn = self.init.cn + ext + 'html'
-        fp = os.path.join(self.init.pp, self.init.cn, fn)
-        sdf.to_html(fp, index=False)
-        
-
+        fn = self.init.cn + ext + '.html'
+        fp = os.path.join(self.init.pp, fn)
+        print(f'Saving View in: \n {fp} \n \n')
+        sdf.to_html(fp)
