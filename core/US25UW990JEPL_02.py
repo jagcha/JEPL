@@ -977,6 +977,7 @@ class DataContainer:
         fcp.to_html(sp, index=False)
     
     def ColSelect(self, f4='f4', f5='f5', key=None):
+        print(f'ColSelect --> key = {key}')
         k = [] if key is None else [key]
         if f4 == 'f4':
             c4 = ['f4X' + str(i4) for i4 in range(1, 315)]
