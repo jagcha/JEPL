@@ -1,6 +1,7 @@
 ################################################ Import modules ########################################################
 from bs4 import BeautifulSoup
 import copy
+from datetime import datetime
 import json
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1050,3 +1051,128 @@ class DataContainer:
             fp = os.path.join(self.init.pp, fn)
             print(f'Saving View in: \n {fp} \n \n')
             sdf.to_html(fp)
+
+    def PlotDiffs(self, dataset_name, stp, n=20000):
+        # A lot in this function can be improved! So far, i will try to leave it working.
+        str1 = 'Type of reproductive event'
+        str2 = 'Date of reproductive event'
+        ks = [
+            int(re.findall(r'X(\d+)', k1)[0])
+            for k1 in self.init.mapf
+            for k2 in self.init.mapf[k1]
+            if (str1 in k2 or str2 in k2)
+        ]
+        if self.init.t:
+            df = self.GetSubset(dataset_name=dataset_name, 
+                                colf4=None,colf5=ks, n=n,
+                                lact='m', seed=22, save=False)
+        else:
+            df = getattr(self, dataset_name)
+
+        print(f'Getting keys of {str1}. \n')
+        tk = [
+            k1
+            for k1 in self.init.mapf
+            for k2 in self.init.mapf[k1]
+            if (str1 in k2)
+        ]
+        print(f'Getting keys of {str2}. \n')
+        dk = [
+            k2
+            for k1 in self.init.mapf
+            for k2 in self.init.mapf[k1]
+            if (str2 in k2)
+        ]
+        # In a given key, run accross reproductive events, and concatenate counted reproductive types, storing differences in days.
+        nr = len(tk)
+        md = {}
+        for row in df.itertuples(index=False):
+            i = 0
+            s = 1
+            k = row.Key
+            md[k] = {}
+            while (i + s <= nr - 1):
+                tri = getattr(row, tk[i])
+                dri = getattr(row, dk[i])
+                trf = getattr(row, tk[i + s])
+                drf = getattr(row, dk[i + s])
+                if not tri.isalpha() or not tri.isupper() or not dri.isdigit():
+                    i += 1
+                    continue
+                elif not trf.isalpha() or not trf.isupper() or not drf.isdigit():
+                    s += 1
+                    continue
+                else:
+                    le = str(i + 1) + tri
+                    ue = str(i + s + 1) + trf
+                    ld = datetime.strptime(dri, "%Y%m%d")
+                    ud = datetime.strptime(drf, "%Y%m%d")
+                    diff = (ud-ld).days
+                    cc = le + ue
+                    md[k][cc] = diff
+                    i = i + s
+                    s = 1 
+        print(f'Once keys have a sequence of events with their sequential difference in days, backetize by unique sequence of events. \n')
+        md2 = {}
+        for k1 in md:
+            k = ''
+            v = []
+            for k2 in md[k1]:
+                if k == '':
+                    k += k2
+                    v.append(md[k1][k2])
+                else:
+                    k += k2[2:]
+                    v.append(md[k1][k2])
+            if k == '':
+                continue
+            if k not in md2.keys():
+                md2[k] = [v]
+            else:
+                md2[k].append(v)   
+        print(f'Sort in decreasing order those concatenated sequence of events. Useful to pick top {stp}. \n')    
+        md2 = dict(sorted(md2.items(), key=lambda i: len(i[1]), reverse=True))
+        print(f'Take the top {stp} of the sorted sequence of events. \n')
+        trk = 0
+        td = {}
+        for k in md2:
+            td[k] = copy.deepcopy(md2[k])
+            trk += 1
+            if trk == stp:
+                break
+        print(f'Instead of time between two consecutive events, show time from first event. \n')
+        for k in td:
+            if len(k) == 4:
+                continue
+            else:
+                for l in td[k]:
+                    i=0
+                    while i+1 <= len(l) - 1:
+                        l[i+1] = l[i] + l[i+1]
+                        i+=1
+        print(f'Setting 20 color grid. \n')
+        myc = [
+            'blue','red','green','orange','purple','cyan','magenta','lime','brown','olive',
+            'teal','pink','gold','navy','maroon','darkgreen','coral','indigo','darkorange','turquoise'
+        ]
+        print(f'Plotting histograms. Saving plots.')
+        for k in td:
+            for s in range(int(len(k)/2) - 1):
+                ls = 0 + 2*s
+                us = 4 + 2*s
+                nm = k[ls:us]
+                cl = myc[s]
+                v = []
+                for l in td[k]:
+                    v += [l[s]]
+                plt.hist(v, bins=100, alpha=0.5, label=nm, color=cl)
+            # Finalize plot
+            plt.legend()
+            plt.title("Flexible Histogram Plot")
+            plt.xlabel("Value")
+            plt.ylabel("Frequency")
+            plt.xlim(0, 365)
+            plt.figure(figsize=(10, 7.5))
+            pn = os.path.join(self.init.p, self.init.cn, self.init.cn + '_' + '020102.' + str(s) + '.png')
+            plt.savefig(pn, dpi=300, bbox_inches='tight')
+            plt.close()

@@ -116,9 +116,7 @@ if JEPL020102 == 0:
     dc = JEPL.DataContainer(init, pdfu = init.TXT_reader(target_path=fp))
     dc.ShowDatasets()
     dc.SetKey(['pdfu'], [['f4X3', 'f4X4', 'f4X5', 'f4X35'], ['f5X3', 'f5X4', 'f5X5', 'f5X35']])
-    print(f'Testing selection of columns: \n'
-          f'Res = {dc.ColSelect(f4=[3,20,21,23], f5=[35,36,43], key="Key")}')
-
+    dc.PlotDiffs('pdfu', stp=3, n=20000)
 else:
     print(f'JEPL020102 skipped when testing is {init.t}. \n')
     print('Hello world!')
