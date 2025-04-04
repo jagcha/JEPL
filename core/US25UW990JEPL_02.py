@@ -979,7 +979,10 @@ class DataContainer:
     
     def ColSelect(self, f4='f4', f5='f5', key=None):
         k = [] if key is None else [key]
-        if f4 == 'f4':
+
+        if f4 == None:
+            c4 = []
+        elif f4 == 'f4':
             c4 = ['f4X' + str(i4) for i4 in range(1, 315)]
         elif isinstance(f4, int) or all(f4[i] + 1 == f4[i + 1] for i in range(len(f4) - 1)):
             if isinstance(f4, int):
@@ -990,7 +993,9 @@ class DataContainer:
         else:
             c4 = ['f4X' + str(i4) for i4 in f4]
 
-        if f5 == 'f5':
+        if f5 == None:
+            c5 = []
+        elif f5 == 'f5':
             c5 = ['f5X' + str(i5) for i5 in range(1, 337)]
         elif isinstance(f5, int) or all(f5[i] + 1 == f5[i + 1] for i in range(len(f5) - 1)):
             if isinstance(f5, int):
@@ -1001,7 +1006,7 @@ class DataContainer:
         else:
             c5 = ['f5X' + str(i5) for i5 in f5]
 
-        return c4 + c5 + k
+        return k + c4 + c5
     
     def GetKeyMask(self, dataset_name, subset_keys, lact):
         c = 17
@@ -1020,8 +1025,6 @@ class DataContainer:
         if 'Key' not in self.__dict__[dataset_name].columns:
             self.SetKey([dataset_name], [['f4X3', 'f4X4', 'f4X5', 'f4X35'], ['f5X3', 'f5X4', 'f5X5', 'f5X35']])
         cols = self.ColSelect(f4=colf4, f5=colf5, key='Key')
-        print(f'cols are: \n {cols} \n \n')
-
         if keys is None:
             ks = list(set(self.__dict__[dataset_name]['Key']))
             np.random.seed(seed)
@@ -1036,7 +1039,6 @@ class DataContainer:
                 mask = self.__dict__[dataset_name]['Key'].isin(keys)
             else:
                 raise AssertionError(f'Length of Key must be 17 or 25. Instead, it is {nk}. \n')
-        print(f'mask.head(): \n {mask.head()} \n \n')
         sdf = self.__dict__[dataset_name].loc[mask, cols]
         sdf = sdf.reset_index(drop=True)
         setattr(self, 'sdf', sdf)

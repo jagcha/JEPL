@@ -1071,7 +1071,14 @@ git push origin my_branch
 This is a **basic yet powerful workflow** that works for most Git projects.
 
 ## Objective:
-- Create a function that targets a subset of Keys, otherwise takes a random sample.
-- Such function also must take a subset of columns.
-- Function must save subseted dataset as html.
-- The objective of this function is to visualize the data and reduce complexity.
+- Create a function that targets a subset of Keys, otherwise takes a random sample. _/
+- Such function also must take a subset of columns. _/
+- Function must save subseted dataset as html. _/
+- The objective of this function is to visualize the data and reduce complexity. _/
+
+- 2 approaches. 1 gives a lot of information, 2 is more story-telling.
+- 1) Take two subsequent Repro events in given lactation. Concatenate event type. Define days in between. Group by concatenated event type. 
+- 1.1) Pick top 3 categories. Plot histogram of differences in days.
+- 1.2) Pick top 3 categories in which first type is P, and second type is some kind of insemination. (I will have to somehow triangulate stuff with the calving date to make sure such subsequent insemination is not in fact a nosense event when the animal was in fact pregnant).
+
+- 2) Plot sequence of events in a visually catchy way. Would help to support further explanations.
