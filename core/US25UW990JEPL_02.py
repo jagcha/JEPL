@@ -1019,7 +1019,7 @@ class DataContainer:
             raise AssertionError(f'Argument `lact` is {lact}. \n'
                                  f'Only `m` (multiple) or `u` (unique) lactations is allowed. \n')
 
-    def GetSubset(self, dataset_name, colf4='f4', colf5='f5', keys=None, ext='', n=10, lact='m', seed=22):
+    def GetSubset(self, dataset_name, colf4='f4', colf5='f5', keys=None, ext='', n=10, lact='m', seed=22, save=False):
         c = 17
         t = 25
         if 'Key' not in self.__dict__[dataset_name].columns:
@@ -1043,9 +1043,10 @@ class DataContainer:
         sdf = sdf.reset_index(drop=True)
         setattr(self, 'sdf', sdf)
         self.ShowDatasets()
-        if ext != '':
-            ext = '_' + ext
-        fn = self.init.cn + ext + '.html'
-        fp = os.path.join(self.init.pp, fn)
-        print(f'Saving View in: \n {fp} \n \n')
-        sdf.to_html(fp)
+        if save:
+            if ext != '':
+                ext = '_' + ext
+            fn = self.init.cn + ext + '.html'
+            fp = os.path.join(self.init.pp, fn)
+            print(f'Saving View in: \n {fp} \n \n')
+            sdf.to_html(fp)

@@ -1082,3 +1082,7 @@ This is a **basic yet powerful workflow** that works for most Git projects.
 - 1.2) Pick top 3 categories in which first type is P, and second type is some kind of insemination. (I will have to somehow triangulate stuff with the calving date to make sure such subsequent insemination is not in fact a nosense event when the animal was in fact pregnant).
 
 - 2) Plot sequence of events in a visually catchy way. Would help to support further explanations.
+
+Meeting 04/04/2025
+- They want to see the differences in day between consecutive events.
+- They want to understand the spaicing between events.
