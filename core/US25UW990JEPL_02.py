@@ -568,7 +568,7 @@ class DataContainer:
                   all(col in df.columns for col in key_columns[0]) and all(col in df.columns for col in key_columns[1])):
                 print(f'Setting key in merged dataset with {df.shape[1]} columns.')
                 df['Key1'] = df[key_columns[0]].astype(str).agg(''.join, axis=1)
-                df['Key2'] = df[key_columns[0]].astype(str).agg(''.join, axis=1)
+                df['Key2'] = df[key_columns[1]].astype(str).agg(''.join, axis=1)
                 ms = 'n'*len(df['Key1'][0])
                 assert not ((df['Key1'] == ms) & (df['Key2'] == ms)).any(), f'ERROR: Both Key1 and Key2 cannot be {ms} in the same row'
                 df['Key'] = df.apply(lambda r: r['Key1'] if r['Key1'] != ms else r['Key2'], axis=1)
@@ -985,6 +985,8 @@ class DataContainer:
             c4 = []
         elif f4 == 'f4':
             c4 = ['f4X' + str(i4) for i4 in range(1, 315)]
+        elif not isinstance(f4, int) and all(not isinstance(c, int) and 'f4X' == c[:3] for c in f4):
+            c4 = f4
         elif isinstance(f4, int) or all(f4[i] + 1 == f4[i + 1] for i in range(len(f4) - 1)):
             if isinstance(f4, int):
                 f4 = [f4]
@@ -998,6 +1000,8 @@ class DataContainer:
             c5 = []
         elif f5 == 'f5':
             c5 = ['f5X' + str(i5) for i5 in range(1, 337)]
+        elif not isinstance(f5, int) and all(not isinstance(c, int) and 'f5X' == c[:3] for c in f5):
+            c5 = f5
         elif isinstance(f5, int) or all(f5[i] + 1 == f5[i + 1] for i in range(len(f5) - 1)):
             if isinstance(f5, int):
                 f5 = [f5]
@@ -1052,27 +1056,24 @@ class DataContainer:
             print(f'Saving View in: \n {fp} \n \n')
             sdf.to_html(fp)
 
-    def PlotDiffs(self, dataset_name, stp, n=20000):
+    def GetColKey(self, colnames=[]):
+        ck = []
+        for k1 in self.init.mapf:
+            for k2 in self.init.mapf[k1]:
+                for col in colnames:
+                    if col in k2:
+                        ck.append(k1)
+                        break
+        return ck
+    
+    def GetSubsqRepDiff(self, dataset):
         str1 = 'Type of reproductive event'
         str2 = 'Date of reproductive event'
-        tk = [ k1 for k1 in self.init.mapf for k2 in self.init.mapf[k1] if (str1 in k2) ]
-        dk = [ k1 for k1 in self.init.mapf for k2 in self.init.mapf[k1] if (str2 in k2) ]
-        if self.init.t:
-            ks = [ int(re.findall(r'X(\d+)', k1)[0]) 
-                  for k1 in self.init.mapf
-                  for k2 in self.init.mapf[k1] if (str1 in k2 or str2 in k2) ]
-            print(f'Loading Sample Dataframe {dataset_name}. \n')
-            self.GetSubset(dataset_name=dataset_name, 
-                           colf4=None,colf5=ks, n=n,
-                           lact='m', seed=22, save=False)
-            df = self.sdf
-        else:
-            print(f'Loading Full Dataframe {dataset_name}. \n')
-            df = getattr(self, dataset_name)
-        print(f'Running accross reproductive events in a given key. \n')
+        tk = self.GetColKey(colnames=[str1])
+        dk = self.GetColKey(colnames=[str2])
         nr = len(tk)
         md = {}
-        for row in df.itertuples(index=False):
+        for row in dataset.itertuples(index=False):
             i = 0
             s = 1
             k = row.Key
@@ -1098,7 +1099,10 @@ class DataContainer:
                     md[k][cc] = diff
                     i = i + s
                     s = 1 
-        print(f'Backetize sequence of events. \n')
+        self.md = md
+        return md
+    
+    def BucketDiffs(self, md):
         md2 = {}
         for k1 in md:
             k = ''
@@ -1115,10 +1119,12 @@ class DataContainer:
             if k not in md2.keys():
                 md2[k] = [v]
             else:
-                md2[k].append(v)   
-        print(f'Sorting by frequency sequence of events. \n')    
+                md2[k].append(v)
         md2 = dict(sorted(md2.items(), key=lambda i: len(i[1]), reverse=True))
-        print(f'Take the top {stp} most frequent events. \n')
+        self.md2 = md2
+        return md2
+    
+    def GetTopBucket(self, md2, stp):
         trk = 0
         td = {}
         for k in md2:
@@ -1126,16 +1132,58 @@ class DataContainer:
             trk += 1
             if trk == stp:
                 break
-        print(f'Show time from first event. \n')
-        for k in td:
+        self.td = td
+        df = pd.DataFrame(list(td.items()), columns=['Secuence', 'Counts'])
+        fp = self.init.SavePath(extension='020102.html', dirct='core')
+        df.to_html(fp, index=False)
+        return td
+    
+    def SetBaseDiff(self, dict_name):
+        dc = getattr(self, dict_name)
+        for k in dc:
             if len(k) == 4:
                 continue
             else:
-                for l in td[k]:
+                for l in dc[k]:
                     i=0
                     while i+1 <= len(l) - 1:
                         l[i+1] = l[i] + l[i+1]
                         i+=1
+        nn = dict_name + '2'
+        setattr(self, nn, dc)
+        self.ShowDatasets()
+        return dc
+
+    def PlotDiffs(self, dataset_name, stp, bins, n=20000):
+        str1 = 'Type of reproductive event'
+        str2 = 'Date of reproductive event'
+        ks = self.GetColKey(colnames=[str1, str2])
+
+        if self.init.t:
+            print(f'Loading Sample Dataframe {dataset_name}. \n')
+            self.GetSubset(dataset_name=dataset_name, 
+                           colf4=None,colf5=ks, n=n,
+                           lact='m', seed=22, save=False)
+            df = self.sdf
+
+        else:
+            print(f'Loading Full Dataframe {dataset_name}. \n')
+            ks = ['Key'] + ks
+            df = getattr(self, dataset_name)[ks]
+
+        print(f'Running accross reproductive events in a given key. \n')
+        md = self.GetSubsqRepDiff(df)
+        
+        print(f'Backetize and sort sequence of events. \n')
+        md2 = self.BucketDiffs(md)
+        
+        print(f'Take the top {stp} most frequent events. \n')
+        td = self.GetTopBucket(md2, stp)
+
+        print(f'Show time from first event. \n')
+        td = self.SetBaseDiff(dict_name='td')
+
+        print('Plotting histograms. \n')
         myc = [
             'blue','red','green','orange','purple','cyan','magenta','lime','brown','olive',
             'teal','pink','gold','navy','maroon','darkgreen','coral','indigo','darkorange','turquoise'
@@ -1150,16 +1198,15 @@ class DataContainer:
                 v = []
                 for l in td[k]:
                     v += [l[s]]
-                plt.hist(v, bins=100, alpha=0.5, label=nm, color=cl)
-            # Finalize plot
+                plt.hist(v, bins=bins, alpha=0.5, label=nm, color=cl)
             plt.legend()
             plt.title("Histogram for Sequential Reproductive Events")
-            plt.xlabel("Days from first reproductive event")
+            plt.xlabel("Days from first recorded reproductive event")
             plt.ylabel("Frequency")
             plt.xlim(0, 365)
-            fn = self.init.cn + '_' + '020102.' + str(idx) + '.png'
-            fp = os.path.join(self.init.pp, fn)
-            print(f'Plot named as {fn} saved in path: \n {fp} \n \n')
+            ext = '020104.' + str(idx) + '.png'
+            fp = self.init.SavePath(extension=ext, dirct='core')
+            print(f'Plot in path: \n {fp} \n \n')
             plt.savefig(fp, dpi=300, bbox_inches='tight')
             plt.close()
             idx += 1

@@ -1086,3 +1086,9 @@ This is a **basic yet powerful workflow** that works for most Git projects.
 Meeting 04/04/2025
 - They want to see the differences in day between consecutive events.
 - They want to understand the spaicing between events.
+
+I did a function that allows the estimation of the elapsed time (days) between consecutive events.
+The function is inside `PlotDiffs()` in `US25UW990JEPL_02.py` module.
+
+Adaptation of function `PlotDiffs()`. Pulishing saving paths. Pulishing modules.
+

@@ -2,7 +2,7 @@
 import US25UW990JEPL_02 as JEPL
 
 ################################################## Parameters ##########################################################
-t = 0
+t = 1
 
 JEPL010101 = 1
 JEPL010501 = 1
@@ -116,7 +116,7 @@ if JEPL020102 == 0:
     dc = JEPL.DataContainer(init, pdfu = init.TXT_reader(target_path=fp))
     dc.ShowDatasets()
     dc.SetKey(['pdfu'], [['f4X3', 'f4X4', 'f4X5', 'f4X35'], ['f5X3', 'f5X4', 'f5X5', 'f5X35']])
-    dc.PlotDiffs('pdfu', stp=3, n=20000)
+    dc.PlotDiffs('pdfu', stp=[10,5][dc.init.t], bins=[5000,100][dc.init.t], n=20000)
 else:
     print(f'JEPL020102 skipped when testing is {init.t}. \n')
 
