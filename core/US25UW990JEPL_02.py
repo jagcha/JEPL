@@ -1124,18 +1124,28 @@ class DataContainer:
         self.md2 = md2
         return md2
     
-    def GetTopBucket(self, md2, stp):
+    def EvalRepKey(self, key, cond):
+        if cond == 0:
+            return True
+        elif cond == 1:
+            return 'P' not in key[:-1] and len(key) >= 8
+        elif cond == 2:
+            return 'P' in key[:-1]
+        else:
+            raise AssertionError(f'Condition {cond} is not valid. \n'
+                                 f'Only 0, 1 or 2 are allowed. \n')
+        
+    
+    def GetTopBucket(self, md2, stp, cond=0):
         trk = 0
         td = {}
         for k in md2:
-            td[k] = copy.deepcopy(md2[k])
-            trk += 1
-            if trk == stp:
-                break
+            if self.EvalRepKey(key=k, cond=cond):
+                td[k] = copy.deepcopy(md2[k])
+                trk += 1
+                if trk == stp:
+                    break
         self.td = td
-        df = pd.DataFrame(list(td.items()), columns=['Secuence', 'Counts'])
-        fp = self.init.SavePath(extension='020102.html', dirct='core')
-        df.to_html(fp, index=False)
         return td
     
     def SetBaseDiff(self, dict_name):
@@ -1154,10 +1164,15 @@ class DataContainer:
         self.ShowDatasets()
         return dc
 
-    def PlotDiffs(self, dataset_name, stp, bins, n=20000):
+    def PlotDiffs(self, dataset_name, stp, bins, cond, n=20000):
         str1 = 'Type of reproductive event'
         str2 = 'Date of reproductive event'
         ks = self.GetColKey(colnames=[str1, str2])
+        
+        d1 = ['impl_', 'test_'][self.init.t] + '020104'
+        d2 = 'cond' + str(cond)
+        dp = os.path.join(self.init.pp, d1, d2)
+        os.makedirs(dp, exist_ok=True)
 
         if self.init.t:
             print(f'Loading Sample Dataframe {dataset_name}. \n')
@@ -1177,8 +1192,8 @@ class DataContainer:
         print(f'Backetize and sort sequence of events. \n')
         md2 = self.BucketDiffs(md)
         
-        print(f'Take the top {stp} most frequent events. \n')
-        td = self.GetTopBucket(md2, stp)
+        print(f'Take the top {stp} most frequent events under condition {cond}. \n')
+        td = self.GetTopBucket(md2, stp, cond=cond)
 
         print(f'Show time from first event. \n')
         td = self.SetBaseDiff(dict_name='td')
@@ -1200,12 +1215,12 @@ class DataContainer:
                     v += [l[s]]
                 plt.hist(v, bins=bins, alpha=0.5, label=nm, color=cl)
             plt.legend()
-            plt.title("Histogram for Sequential Reproductive Events")
+            plt.title(f"Histogram (N = {len(v)})")
             plt.xlabel("Days from first recorded reproductive event")
             plt.ylabel("Frequency")
             plt.xlim(0, 365)
-            ext = '020104.' + str(idx) + '.png'
-            fp = self.init.SavePath(extension=ext, dirct='core')
+            ext = 'hist' + str(idx).zfill(len(str(stp))) + '.png'
+            fp = os.path.join(dp, ext)
             print(f'Plot in path: \n {fp} \n \n')
             plt.savefig(fp, dpi=300, bbox_inches='tight')
             plt.close()
