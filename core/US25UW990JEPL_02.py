@@ -1053,37 +1053,23 @@ class DataContainer:
             sdf.to_html(fp)
 
     def PlotDiffs(self, dataset_name, stp, n=20000):
-        # A lot in this function can be improved! So far, i will try to leave it working.
         str1 = 'Type of reproductive event'
         str2 = 'Date of reproductive event'
-        ks = [
-            int(re.findall(r'X(\d+)', k1)[0])
-            for k1 in self.init.mapf
-            for k2 in self.init.mapf[k1]
-            if (str1 in k2 or str2 in k2)
-        ]
+        tk = [ k1 for k1 in self.init.mapf for k2 in self.init.mapf[k1] if (str1 in k2) ]
+        dk = [ k1 for k1 in self.init.mapf for k2 in self.init.mapf[k1] if (str2 in k2) ]
         if self.init.t:
-            df = self.GetSubset(dataset_name=dataset_name, 
-                                colf4=None,colf5=ks, n=n,
-                                lact='m', seed=22, save=False)
+            ks = [ int(re.findall(r'X(\d+)', k1)[0]) 
+                  for k1 in self.init.mapf
+                  for k2 in self.init.mapf[k1] if (str1 in k2 or str2 in k2) ]
+            print(f'Loading Sample Dataframe {dataset_name}. \n')
+            self.GetSubset(dataset_name=dataset_name, 
+                           colf4=None,colf5=ks, n=n,
+                           lact='m', seed=22, save=False)
+            df = self.sdf
         else:
+            print(f'Loading Full Dataframe {dataset_name}. \n')
             df = getattr(self, dataset_name)
-
-        print(f'Getting keys of {str1}. \n')
-        tk = [
-            k1
-            for k1 in self.init.mapf
-            for k2 in self.init.mapf[k1]
-            if (str1 in k2)
-        ]
-        print(f'Getting keys of {str2}. \n')
-        dk = [
-            k2
-            for k1 in self.init.mapf
-            for k2 in self.init.mapf[k1]
-            if (str2 in k2)
-        ]
-        # In a given key, run accross reproductive events, and concatenate counted reproductive types, storing differences in days.
+        print(f'Running accross reproductive events in a given key. \n')
         nr = len(tk)
         md = {}
         for row in df.itertuples(index=False):
@@ -1112,7 +1098,7 @@ class DataContainer:
                     md[k][cc] = diff
                     i = i + s
                     s = 1 
-        print(f'Once keys have a sequence of events with their sequential difference in days, backetize by unique sequence of events. \n')
+        print(f'Backetize sequence of events. \n')
         md2 = {}
         for k1 in md:
             k = ''
@@ -1130,9 +1116,9 @@ class DataContainer:
                 md2[k] = [v]
             else:
                 md2[k].append(v)   
-        print(f'Sort in decreasing order those concatenated sequence of events. Useful to pick top {stp}. \n')    
+        print(f'Sorting by frequency sequence of events. \n')    
         md2 = dict(sorted(md2.items(), key=lambda i: len(i[1]), reverse=True))
-        print(f'Take the top {stp} of the sorted sequence of events. \n')
+        print(f'Take the top {stp} most frequent events. \n')
         trk = 0
         td = {}
         for k in md2:
@@ -1140,7 +1126,7 @@ class DataContainer:
             trk += 1
             if trk == stp:
                 break
-        print(f'Instead of time between two consecutive events, show time from first event. \n')
+        print(f'Show time from first event. \n')
         for k in td:
             if len(k) == 4:
                 continue
@@ -1150,12 +1136,11 @@ class DataContainer:
                     while i+1 <= len(l) - 1:
                         l[i+1] = l[i] + l[i+1]
                         i+=1
-        print(f'Setting 20 color grid. \n')
         myc = [
             'blue','red','green','orange','purple','cyan','magenta','lime','brown','olive',
             'teal','pink','gold','navy','maroon','darkgreen','coral','indigo','darkorange','turquoise'
         ]
-        print(f'Plotting histograms. Saving plots.')
+        idx = 0
         for k in td:
             for s in range(int(len(k)/2) - 1):
                 ls = 0 + 2*s
@@ -1168,11 +1153,13 @@ class DataContainer:
                 plt.hist(v, bins=100, alpha=0.5, label=nm, color=cl)
             # Finalize plot
             plt.legend()
-            plt.title("Flexible Histogram Plot")
-            plt.xlabel("Value")
+            plt.title("Histogram for Sequential Reproductive Events")
+            plt.xlabel("Days from first reproductive event")
             plt.ylabel("Frequency")
             plt.xlim(0, 365)
-            plt.figure(figsize=(10, 7.5))
-            pn = os.path.join(self.init.p, self.init.cn, self.init.cn + '_' + '020102.' + str(s) + '.png')
-            plt.savefig(pn, dpi=300, bbox_inches='tight')
+            fn = self.init.cn + '_' + '020102.' + str(idx) + '.png'
+            fp = os.path.join(self.init.pp, fn)
+            print(f'Plot named as {fn} saved in path: \n {fp} \n \n')
+            plt.savefig(fp, dpi=300, bbox_inches='tight')
             plt.close()
+            idx += 1

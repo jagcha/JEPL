@@ -2,7 +2,7 @@
 import US25UW990JEPL_02 as JEPL
 
 ################################################## Parameters ##########################################################
-t = 1
+t = 0
 
 JEPL010101 = 1
 JEPL010501 = 1
@@ -119,8 +119,6 @@ if JEPL020102 == 0:
     dc.PlotDiffs('pdfu', stp=3, n=20000)
 else:
     print(f'JEPL020102 skipped when testing is {init.t}. \n')
-    print('Hello world!')
-    pass
 
 ############################################### Ends Profiling ##########################################################
 init.EndsProfiling()
