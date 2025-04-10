@@ -224,10 +224,15 @@ class Initializer:
             if target_file in file_names:
                 return os.path.join(dir_path, target_file)
             
-    def FileName(self, extension):
-        return self.cn + ['_impl_', '_test_'][self.t] + extension
+    def FileName(self, extension, mode=0):
+        if mode == 0:
+            return self.cn + ['_impl_', '_test_'][self.t] + extension
+        elif mode == 1:
+            return extension
+        else:
+            raise ValueError('Invalid mode. Use 0 for default naming or 1 for custom naming.')
 
-    def SavePath(self, extension, dirct='data'):
+    def SavePath(self, extension, dirct='data', mode=0):
         """
         Takes the extension and returns the path where file must be saved.
         According to `dirct`, path is created in 'core' or 'data'.
@@ -241,7 +246,7 @@ class Initializer:
         else:
             pth = self.pp
 
-        fn = self.FileName(extension=extension)
+        fn = self.FileName(extension=extension, mode=mode)
         return os.path.join(pth, fn)    
 
     def Save_PDF_as_TXT(self, pandas_df, extension):
@@ -1069,8 +1074,8 @@ class DataContainer:
     def GetSubsqRepDiff(self, dataset):
         str1 = 'Type of reproductive event'
         str2 = 'Date of reproductive event'
-        tk = self.GetColKey(colnames=[str1])
-        dk = self.GetColKey(colnames=[str2])
+        tk = ['C'] + self.GetColKey(colnames=[str1])
+        dk = ['f4X35'] + self.GetColKey(colnames=[str2])
         nr = len(tk)
         md = {}
         for row in dataset.itertuples(index=False):
@@ -1078,8 +1083,11 @@ class DataContainer:
             s = 1
             k = row.Key
             md[k] = {}
-            while (i + s <= nr - 1):
-                tri = getattr(row, tk[i])
+            while i + s <= nr - 1:
+                if i == 0:
+                    tri = tk[i]
+                else:
+                    tri = getattr(row, tk[i])
                 dri = getattr(row, dk[i])
                 trf = getattr(row, tk[i + s])
                 drf = getattr(row, dk[i + s])
@@ -1090,14 +1098,14 @@ class DataContainer:
                     s += 1
                     continue
                 else:
-                    le = str(i + 1) + tri
-                    ue = str(i + s + 1) + trf
+                    le = str(i) + tri
+                    ue = str(i + s) + trf
                     ld = datetime.strptime(dri, "%Y%m%d")
                     ud = datetime.strptime(drf, "%Y%m%d")
                     diff = (ud-ld).days
                     cc = le + ue
                     md[k][cc] = diff
-                    i = i + s
+                    i += s
                     s = 1 
         self.md = md
         return md
@@ -1128,7 +1136,7 @@ class DataContainer:
         if cond == 0:
             return True
         elif cond == 1:
-            return 'P' not in key[:-1] and len(key) >= 8
+            return 'P' not in key[:-1] and len(key) >= 10
         elif cond == 2:
             return 'P' in key[:-1]
         else:
@@ -1164,7 +1172,7 @@ class DataContainer:
         self.ShowDatasets()
         return dc
 
-    def PlotDiffs(self, dataset_name, stp, bins, cond, n=20000):
+    def PlotDiffs(self, dataset_name, stp, cond, bins=365, n=20000):
         str1 = 'Type of reproductive event'
         str2 = 'Date of reproductive event'
         ks = self.GetColKey(colnames=[str1, str2])
@@ -1177,13 +1185,13 @@ class DataContainer:
         if self.init.t:
             print(f'Loading Sample Dataframe {dataset_name}. \n')
             self.GetSubset(dataset_name=dataset_name, 
-                           colf4=None,colf5=ks, n=n,
+                           colf4=35,colf5=ks, n=n,
                            lact='m', seed=22, save=False)
             df = self.sdf
 
         else:
             print(f'Loading Full Dataframe {dataset_name}. \n')
-            ks = ['Key'] + ks
+            ks = ['Key'] + ['f4X35'] + ks
             df = getattr(self, dataset_name)[ks]
 
         print(f'Running accross reproductive events in a given key. \n')
@@ -1200,10 +1208,11 @@ class DataContainer:
 
         print('Plotting histograms. \n')
         myc = [
-            'blue','red','green','orange','purple','cyan','magenta','lime','brown','olive',
+            'red','green','blue','orange','purple','cyan','magenta','lime','brown','olive',
             'teal','pink','gold','navy','maroon','darkgreen','coral','indigo','darkorange','turquoise'
         ]
         idx = 0
+        be = np.arange(0, bins+1)
         for k in td:
             for s in range(int(len(k)/2) - 1):
                 ls = 0 + 2*s
@@ -1213,15 +1222,201 @@ class DataContainer:
                 v = []
                 for l in td[k]:
                     v += [l[s]]
-                plt.hist(v, bins=bins, alpha=0.5, label=nm, color=cl)
+                plt.hist(v, bins=be, alpha=0.5, label=nm, color=cl)
             plt.legend()
             plt.title(f"Histogram (N = {len(v)})")
-            plt.xlabel("Days from first recorded reproductive event")
+            plt.xlabel("Days from calving date")
             plt.ylabel("Frequency")
             plt.xlim(0, 365)
+            plt.xticks(np.arange(0, bins+1, 30))
             ext = 'hist' + str(idx).zfill(len(str(stp))) + '.png'
             fp = os.path.join(dp, ext)
             print(f'Plot in path: \n {fp} \n \n')
             plt.savefig(fp, dpi=300, bbox_inches='tight')
             plt.close()
             idx += 1
+    
+    def f_X35Standardize(self, dataset_name):
+        df = getattr(self, dataset_name)
+        assert 'f4X35' in df.columns, 'Column f4X35 not found in dataframe. \n'
+        assert 'f5X35' in df.columns, 'Column f5X35 not found in dataframe. \n'
+        c = []
+        for r in df.itertuples():
+            if r.f4X35 == 'n'*8 and r.f5X35 == 'n'*8:
+                print('Error in condition 1.')
+                assert False
+            elif r.f4X35 == 'n'*8 and r.f5X35.isdigit() and len(r.f5X35) == 8:
+                c.append(r.f5X35)
+            elif r.f4X35 == 'n'*8 and r.f5X35 == ' '*8:
+                c.append(r.f5X35)
+            elif r.f4X35.isdigit() and len(r.f4X35) == 8 and r.f5X35 == 'n'*8:
+                c.append(r.f4X35)
+            elif r.f4X35.isdigit() and len(r.f4X35) == 8 and r.f5X35.isdigit() and len(r.f5X35) == 8:
+                c.append(r.f4X35)
+            elif r.f4X35.isdigit() and len(r.f4X35) == 8 and r.f5X35 == ' '*8:
+                print('Error in condition 6.')
+                assert False
+            elif r.f4X35 == ' '*8 and r.f5X35 == 'n'*8:
+                c.append(r.f4X35)
+            elif r.f4X35 == ' '*8 and r.f5X35.isdigit() and len(r.f5X35) == 8:
+                print('Error in condition 8.')
+                assert False
+            elif r.f4X35 == ' '*8 and r.f5X35 == ' '*8:
+                c.append(r.f4X35)
+            else:
+                print('Something unexpected is happening.')
+                assert False
+        df['f4X35'] = c
+        setattr(self, dataset_name, df)
+
+    def CheckDirs(self, extension, subroot='core'):
+        if subroot == 'core':
+            rp = self.init.pp
+        elif subroot == 'data':
+            rp = self.init.dp
+        else:
+            raise AssertionError(f'Argument `subroot` is {subroot}. \n'
+                                 f'Only `core` or `data` are allowed. \n')
+        d1 = ['impl_', 'test_'][self.init.t] + extension
+        dp = os.path.join(rp, d1)
+        print(f'Checking presence of directory {dp}. \n')
+        os.makedirs(dp, exist_ok=True)
+        if subroot == 'core':
+            self.init.pp = dp
+        elif subroot == 'data':
+            self.init.sp = dp
+    
+    def MultiparousCounter(self, df):
+        d = {}
+        for row in df.itertuples():
+            if row.Key[:-8] not in d.keys():
+                d[row.Key[:-8]] = 1
+            else:
+                d[row.Key[:-8]] += 1       
+        c1 = 0
+        c2 = 0
+        for k in d:
+            if d[k] == 1:
+                c1 += 1
+            else:
+                c2 += 1
+        return c1, c2
+
+    def JEPL0202DiffSubsqLact(self, df):
+        v = []
+        n = df.shape[0]
+        i=0
+        while i + 1 < n:
+            ki = df.at[i, 'Key']
+            kf = df.at[i+1, 'Key']
+            if ki[:-8] == kf[:-8]:
+                li = df.at[i, 'f4X43']
+                lf = df.at[i+1, 'f4X43']
+                if li.isdigit() and lf.isdigit():
+                    v.append(int(lf) - int(li))
+                i += 1
+                continue
+            else:
+                i += 1
+                continue
+        return v
+
+    def JEPL0202CounterP(self, df):
+        sk5 = self.GetColKey(colnames=['Type of reproductive event'])
+        cp = 0
+        ca = 0
+        i = 0
+        n = df.shape[0]
+        while i + 1 < n:
+            ki = df.at[i, 'Key']
+            kf = df.at[i+1, 'Key']
+            if ki[:-8] == kf[:-8]:
+                li = df.at[i, 'f4X43']
+                lf = df.at[i+1, 'f4X43']
+                if li.isdigit() and lf.isdigit() and int(lf) - int(li) == 1:
+                    ca += 1
+                    rr = df[sk5].iloc[i]
+                    rc = ''.join(rr.str.rstrip())
+                    rf = rc[-1] if rc else ''
+                    if 'P' == rf:
+                        cp += 1
+                        i += 1
+                    else:
+                        i += 1
+                else:
+                    i += 1
+            else:
+                i += 1
+        print(f'Total number of consecutive lactation pairs: {ca:,}')
+        print(f'Total number of consecutive lactation pairs with a confirmed pregnancy check: {cp:,}')
+        print(f'Percentage of consecutive lactation pairs with a confirmed pregnancy check: {100*cp/ca:.2f}')
+
+    def JEPL0202TargetStrange(self, df):
+        sk5 = self.GetColKey(colnames=['Type of reproductive event'])
+        v = []
+        i = 0
+        n = df.shape[0]
+        while i + 1 < n:
+            ki = df.at[i, 'Key']
+            kf = df.at[i+1, 'Key']
+            if ki[:-8] == kf[:-8]:
+                li = df.at[i, 'f4X43']
+                lf = df.at[i+1, 'f4X43']
+                if li.isdigit() and lf.isdigit() and int(lf) - int(li) == 1:
+                    rr = df[sk5].iloc[i]
+                    rc = ''.join(rr.str.rstrip())
+                    rf = rc[-1] if rc else ''
+                    if 'P' != rf:
+                        v.append(rf)
+                        i += 1
+                    else:
+                        i += 1
+                else:
+                    i += 1
+            else:
+                i += 1
+        return v
+    
+    def JEPL0202GetInterval(self, df):
+        kt = self.GetColKey(colnames=['Type of reproductive event'])
+        kd = self.GetColKey(colnames=['Date of reproductive event'])
+        vp = []
+        vo = []
+        i = 0
+        n = df.shape[0]
+        while i + 1 < n:
+            ki = df.at[i, 'Key']
+            kf = df.at[i+1, 'Key']
+            cd = df.at[i+1, 'f4X35']
+            if ki[:-8] == kf[:-8] and cd.isdigit():
+                li = df.at[i, 'f4X43']
+                lf = df.at[i+1, 'f4X43']
+                if li.isdigit() and lf.isdigit() and int(lf) - int(li) == 1:
+                    z = 0
+                    v = -1
+                    while z + 1 <= len(kd):
+                        rd = df.at[i, kd[z]]
+                        if rd.isdigit():
+                            v = z
+                            z += 1
+                        else:
+                            z += 1
+                    if v != -1:
+                        rt = df.at[i, kt[v]]
+                        rd = df.at[i, kd[v]]
+                        ld = datetime.strptime(rd, "%Y%m%d")
+                        ud = datetime.strptime(cd, "%Y%m%d")
+                        diff = (ud-ld).days
+                        if 'P' == rt:
+                            vp.append(diff)
+                            i += 1
+                        else:
+                            vo.append(diff)
+                            i += 1
+                    else:
+                        i += 1
+                else:
+                    i += 1
+            else:
+                i += 1
+        return vp, vo
