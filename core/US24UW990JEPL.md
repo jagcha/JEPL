@@ -1013,7 +1013,7 @@ git checkout -b my_branch
 ```bash
 # Modify your files as needed.
 # Check what has changed:
-git status
+git statusgit
 
 # Add specific files:
 git add filename.py
@@ -1163,6 +1163,6 @@ P and O latter going to be used to flag 0 and 1.
 H likelly to be used for flag 1's.
 H, S, P, O, X, D not expected to be an event supposed to end up in pregnancy success.
 
-# 05/08/2025 Thr
+# 05/08/2025
 
 Enriching dataset. Preparing standardized data to proceed w/ stat analysis!
