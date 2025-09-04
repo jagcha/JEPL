@@ -5,7 +5,7 @@ import pandas as pd
 import US25UW990JEPL_02 as JEPL
 
 ################################################## Parameters ##########################################################
-t = 1
+t = 0
 
 JEPL010101 = 1
 JEPL010501 = 1
@@ -219,7 +219,7 @@ if JEPL0202 == 0:
     dc.JEPL0202CounterP(df)
 
     print('Among events with consecutive lactations: \n Target last recorded reproductive event that is not P and show frequency distribution of such event. \n')
-    dc.JEPL0202TargetStrange(df)
+    v = dc.JEPL0202TargetStrange(df)
     v_df = pd.DataFrame(v, columns=['Other Categories Different than Pregnancy Confirmation'])
     vc = v_df['Other Categories Different than Pregnancy Confirmation'].value_counts().sort_values(ascending=False)
     plt.figure(figsize=(13.33, 7.5))
@@ -236,35 +236,36 @@ if JEPL0202 == 0:
     plt.savefig(fp, dpi=300, bbox_inches='tight')
     plt.close()
 
-    print('Among consecutive lactations: \n Interval Last reproductive event and calving. \n'
-          '1- Show interval for those animals showing P-Calving. \n'
-          '2- Show interval for those animals showing *-Calving. \n')
-    vp, vo = dc.JEPL0202GetInterval(df)
-    be = np.arange(min(vp)-1, max(vp)+1)
-    plt.hist(vp, bins=be, alpha=0.5, label=f'P-C (n = {len(vp)})', color='green')
-    plt.hist(vo, bins=be, alpha=0.5, label=f'*-C (n = {len(vo)})', color='red')
-    plt.legend()
-    plt.title(f"Histogram (N = {len(vp) + len(vo)})")
-    plt.xlabel("Interval Last Reproductive Event to Calving.")
-    plt.ylabel("Frequency")
-    ext = 'JEPL0202_IntervalRepCalv.png'
-    fp = dc.init.SavePath(extension=ext, dirct='core', mode=1)
-    print(f'Saving result as plot in path: \n {fp} \n \n')
-    plt.savefig(fp, dpi=300, bbox_inches='tight')
-    plt.close()
+    ## CRF: Chunk below causes infinite while loop. However, it has useful lines.
+    # print('Among consecutive lactations: \n Interval Last reproductive event and calving. \n'
+    #       '1- Show interval for those animals showing P-Calving. \n'
+    #       '2- Show interval for those animals showing *-Calving. \n')
+    # vp, vo = dc.JEPL0202GetInterval(df)
+    # be = np.arange(min(vp)-1, max(vp)+1)
+    # plt.hist(vp, bins=be, alpha=0.5, label=f'P-C (n = {len(vp)})', color='green')
+    # plt.hist(vo, bins=be, alpha=0.5, label=f'*-C (n = {len(vo)})', color='red')
+    # plt.legend()
+    # plt.title(f"Histogram (N = {len(vp) + len(vo)})")
+    # plt.xlabel("Interval Last Reproductive Event to Calving.")
+    # plt.ylabel("Frequency")
+    # ext = 'JEPL0202_IntervalRepCalv.png'
+    # fp = dc.init.SavePath(extension=ext, dirct='core', mode=1)
+    # print(f'Saving result as plot in path: \n {fp} \n \n')
+    # plt.savefig(fp, dpi=300, bbox_inches='tight')
+    # plt.close()
 
-    be = np.arange(170, 371)
-    plt.hist(vp, bins=be, alpha=0.5, label=f'P-C (n = {len(vp)})', color='green')
-    plt.hist(vo, bins=be, alpha=0.5, label=f'*-C (n = {len(vo)})', color='red')
-    plt.legend()
-    plt.title(f"Histogram (N = {len(vp) + len(vo)})")
-    plt.xlabel("Interval Last Reproductive Event to Calving.")
-    plt.ylabel("Frequency")
-    ext = 'JEPL0202_IntervalRepCalvNarrow.png'
-    fp = dc.init.SavePath(extension=ext, dirct='core', mode=1)
-    print(f'Saving result as plot in path: \n {fp} \n \n')
-    plt.savefig(fp, dpi=300, bbox_inches='tight')
-    plt.close()
+    # be = np.arange(170, 371)
+    # plt.hist(vp, bins=be, alpha=0.5, label=f'P-C (n = {len(vp)})', color='green')
+    # plt.hist(vo, bins=be, alpha=0.5, label=f'*-C (n = {len(vo)})', color='red')
+    # plt.legend()
+    # plt.title(f"Histogram (N = {len(vp) + len(vo)})")
+    # plt.xlabel("Interval Last Reproductive Event to Calving.")
+    # plt.ylabel("Frequency")
+    # ext = 'JEPL0202_IntervalRepCalvNarrow.png'
+    # fp = dc.init.SavePath(extension=ext, dirct='core', mode=1)
+    # print(f'Saving result as plot in path: \n {fp} \n \n')
+    # plt.savefig(fp, dpi=300, bbox_inches='tight')
+    # plt.close()
 
 else:
     print(f'JEPL0202 skipped when testing is {init.t}. \n')

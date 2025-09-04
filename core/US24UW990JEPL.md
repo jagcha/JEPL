@@ -1092,3 +1092,77 @@ The function is inside `PlotDiffs()` in `US25UW990JEPL_02.py` module.
 
 Adaptation of function `PlotDiffs()`. Pulishing saving paths. Pulishing modules.
 
+# 04/05/2025 to 04/06/2025 (Sat & Sun)
+- I was eble to plot histograms showing distribution of elapsed time between two cnsecutive reproduction events.
+
+# 04/09/2025
+Few improvments:
+1- Add C-R1 interval to `dc.PlotDiffs` definition. Done.
+
+2- Next steps.
+- Get proportion of nulliparous and multiparous.
+- Get proportion of ID-Lact ending reproductive sequence with P
+- Get proportion of animals with 1 or more lactations.
+- Among animals with multiple lactations, get difference between subsequent recorded lactations. Plot barplot. We should expect all 1.
+- Among animals having two sequential lactations with diff 1, get interval between date last reproductive event and subsequent calving date. We should expect 9*30
+
+Fundational concern:
+- Information in key must be sound. Spoecially calving date. For a given row, you must have a single calving date. you can not have 2 calving dates on with 'nnnnnnnn'. You need to make sure to check this.
+- Latter I will correct the staff related to shared columns. They must have consistent information.
+- Another potential issue.., is that key is the concatenation of raw information. Errors in YYYYDDMM may lead to differnt keys.
+
+# 04/10/2025
+- Potential structural improvements:
+1- `SetKey`: If Key is present, and you do not force the override, just don't do nothing. This will smooth out the back-and-forth process when testing and developing.
+2- I will be working in modules. Same code will have different modules activated. Output of one module may be importnat (print statements). It would be nice if I can allocate such print statements in a specific folder corresponding to the module. This is specially important for the module `0202`.
+3- If a plot is super standard, you could define this as a function.
+
+`JEPL0202`
+I did multiple exploration:
+- Number of nulliparous.
+- Number of IDs with multiple lactations.
+- Interval between two sequential lactations. Exploration of missing lacations.
+- Percentage of Keys with recorded reproductive events (f5 has key, then key counts as recorded).
+- Among keys with recorded events, show last reproductive type event. Plot frequency distribution.
+- Frequency distribution of lactations.
+- Among animals with sequential lactations, check if initial lactation ends ith pregnancy check. If not, show how they are labeling last reproductive event.
+- Among animals with sequentiual lactations: show interval Pregnancy Calving for thos with Pregnancy check. Show Interval 'whatever' - Calving for those w/o Preg-check. (This analysis may also exclude interval in which dates are not valid).
+
+
+# 04/11/2025
+Important code to transfer data from remote ssh server to personal computer:
+```
+(base) agustinchasco@Agustins-MacBook-Air US25UW990JEPL.02.01.04 % scp -r agustinchasco@hpg2.rc.ufl.edu:'/blue/mateescu/agustinchasco/Projects/reprojersey/core/US25UW990JEPL.02/implement/impl_020104/*' "/Users/agustinchasco/Documents/UW Madison/Core/Research/reprojersey/results/US25UW990JEPL.02.01.04"
+```
+
+# 04/12/2025 - 05/01/2025
+Meeting with my committee.
+Finals, reports and presentations.
+Reading paper related to early/late fetal losses. ref:
+
+# 05/02/2025
+Presentation/meeting. We decided that we are going to get interval service service.
+We do know some services ending in pregnancy loses.
+We do know sometimes this is not recorded.
+We do know that whenever felat mortality occurs, interval service service gets delayed. 
+Then, validate fetal mortality (0, 1) with interval service service. They m,ust be highly correlated.
+
+End of semester: report & presentation BMI620, final exam STAT850.
+
+# 05/07/2025 Wed
+Subset these IDs where you know there are Fetal Mortality (recording O after P).
+Subset random IDs where you do not know anything about FM.
+
+Develop pipeline with this subseted data. 
+
+## Defining reproductive types. Excluding some lavels.
+Reproductive events any acttion with the intention of end up in a conception. The definition is wide, but also robust. 
+Diversity in such definition will be accounted as different labels on fixed effects.
+E, I and J may result as different category, but latter I will account for that adding this as fixed effect in my model.
+P and O latter going to be used to flag 0 and 1.
+H likelly to be used for flag 1's.
+H, S, P, O, X, D not expected to be an event supposed to end up in pregnancy success.
+
+# 05/08/2025 Thr
+
+Enriching dataset. Preparing standardized data to proceed w/ stat analysis!
