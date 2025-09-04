@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Slurm output
+*.out
+
+# Environment folders
+envs/
+*.env
+
+# Data folders
+data/
+*.pdf
+*.html

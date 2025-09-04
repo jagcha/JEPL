@@ -1,0 +1,3 @@
+slurmstepd: error: *** JOB 64580604 ON c0710a-s16 CANCELLED AT 2025-04-11T04:05:38 DUE TO TIME LIMIT ***
+/tmp/slurmd/job64600131/slurm_script: line 11: 834632 Killed                  python3.9 US25UW990JEPL.02.py > US25UW990JEPL.02.out
+slurmstepd: error: Detected 1 oom_kill event in StepId=64600131.batch. Some of the step tasks have been OOM Killed.
